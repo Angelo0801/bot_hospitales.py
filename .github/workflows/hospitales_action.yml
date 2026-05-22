@@ -1,0 +1,37 @@
+name: Bot Reporte Hospitales MOP
+
+on:
+  schedule:
+    # Corre todos los lunes a las 8:00 AM (Hora UTC)
+    - cron: '0 12 * * 1' 
+  workflow_dispatch: # Esto activa el botón para correrlo a mano
+
+jobs:
+  ejecutar-bot-hospitales:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ejecutar script de hospitales
+        env:
+          MP_TICKET: ${{ secrets.MP_TICKET }} # Usa tu misma llave secreta
+        run: python bot_hospitales.py
+
+      # Esto hace que GitHub guarde el Excel generado para que lo descargues
+      - name: Guardar Excel generado
+        uses: actions/upload-artifact@v4
+        with:
+          name: Reporte_Hospitales_Generado
+          path: Seguimiento_Proyectos_Hospitalarios_Auto.xlsx
